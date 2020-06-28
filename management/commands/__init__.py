@@ -1,4 +1,4 @@
-from typing import Dict, Callable, List
+from typing import Dict, Callable, List, Tuple
 from .util import assert_arguments
 from ..query import Query
 from ..exceptions import UserError
@@ -23,17 +23,17 @@ def list_boards(session: Session, arguments: List[str]):
             print(f"- {name}")
 
 
-def get_board_id(session: Session, board_name: str) -> int:
+def get_board_id(session: Session, board_name: str) -> Tuple[int, str]:
     if board_name == '--':
         return Query(
             session,
-            'select id from boards where is_favorite = true;',
-        ).one()[0]
+            'select id, name from boards where is_favorite = true;',
+        ).one()
     return Query(
         session,
-        'select id from boards where name = %s;',
+        'select id, name from boards where name = %s;',
         (board_name,),
-    ).one()[0]
+    ).one()
 
 
 def set_favorite_board(session: Session, arguments: List[str]) -> None:
@@ -44,27 +44,27 @@ def set_favorite_board(session: Session, arguments: List[str]) -> None:
     ).run()
 
 
-def get_column_id(session: Session, board_id: int, column_name: str) -> int:
+def get_column_id(session: Session, board_id: int, column_name: str) -> Tuple[int, str]:
     if column_name == '--':
         return Query(
             session,
             '''
-                select id from columns where board_id = %s
+                select id, name from columns where board_id = %s
                 order by index limit 1;
             ''',
             (board_id,),
-        ).one()[0]
+        ).one()
     return Query(
         session,
-        'select id from columns where name = %s and board_id = %s;',
+        'select id, name from columns where name = %s and board_id = %s;',
         (column_name, board_id),
-    ).one()[0]
+    ).one()
 
 
 def add_card(session: Session, arguments: List[str]):
-    board_name, column_name, card_name = assert_arguments(arguments, 2)
-    board_id = get_board_id(session, board_name)
-    column_id = get_column_id(session, board_id, column_name)
+    board_name, column_name, card_name = assert_arguments(arguments, 3)
+    board_id, _ = get_board_id(session, board_name)
+    column_id, _ = get_column_id(session, board_id, column_name)
 
     Query(
         session,
@@ -88,8 +88,8 @@ def get_column_names(session: Session, board_id: int) -> List[str]:
 
 
 def list_cards(session: Session, arguments: List[str]):
-    board_name, = assert_arguments(arguments, 1)
-    board_id = get_board_id(session, board_name)
+    board_name_arg, = assert_arguments(arguments, 1)
+    board_id, board_name = get_board_id(session, board_name_arg)
     column_names = get_column_names(session, board_id)
     columns = {column_name: [] for column_name in column_names}
     query = Query(session,
@@ -110,7 +110,7 @@ def list_cards(session: Session, arguments: List[str]):
 
 def add_column(session: Session, arguments: List[str]):
     board_name, column_name = assert_arguments(arguments, 2)
-    board_id = get_board_id(session, board_name)
+    board_id, _ = get_board_id(session, board_name)
     column_names = get_column_names(session, board_id)
     Query(session,
           'insert into columns (board_id, name, index) values (%s, %s, %s);',
@@ -119,8 +119,8 @@ def add_column(session: Session, arguments: List[str]):
 
 def move_card(session: Session, arguments: List[str]):
     board_name, card_name, column_name = assert_arguments(arguments, 3)
-    board_id = get_board_id(session, board_name) 
-    column_id = get_column_id(session, board_id, card_name)
+    board_id, _ = get_board_id(session, board_name) 
+    column_id, _ = get_column_id(session, board_id, card_name)
     Query(session,
           '''update cards set column_id = %s
           where card_name = %s
@@ -130,7 +130,7 @@ def move_card(session: Session, arguments: List[str]):
 
 def build_shift_card(shift: int):
     def shift_card(session: Session, board_name: str, card_name: int):
-        board_id = get_board_id(session, board_name) 
+        board_id, _ = get_board_id(session, board_name) 
         Query(session, '''
               with (
                   select cards.id as card_id,
