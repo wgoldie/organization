@@ -34,4 +34,7 @@ class Query(object):
         self._enter()
         self._exit()
 
-
+    def one(self):
+        results = list(self._enter())
+        assert len(results) == 1
+        return results[0]
