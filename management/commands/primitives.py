@@ -40,14 +40,14 @@ def get_column_id(session: Session, board_id: int, column_name: str) -> Tuple[in
         ).one()
     if column_name.startswith('*'):
         try:
-            column_id = int(column_name[1:])
+            column_index = int(column_name[1:])
         except (TypeError, ValueError):
-            raise UserError(
-                'Column references beginning with * are treated as raw ids')
+            raise UserError('Column references beginning with * ' +
+                            'are treated as raw indices')
         return Query(
             session,
-            'select id, name from columns where id = %s and board_id = %s',
-            (column_id, board_id),
+            'select id, name from columns where index = %s and board_id = %s',
+            (column_index, board_id),
         ).one()
     return Query(
         session,
@@ -77,11 +77,11 @@ def get_card_id(session: Session, board_id: int, card_name: str):
 
 def get_column_names(session: Session, board_id: int) -> List[Tuple[int, str]]:
     query = Query(session, '''
-                  select columns.id, columns.name
+                  select columns.index, columns.name
                   from columns
                   where board_id = %s
                   order by index;''',
                   (board_id,))
     with query as cursor:
-        return [(column_id, column_name)
-                for column_id, column_name in cursor]
+        return [(column_index, column_name)
+                for column_index, column_name in cursor]
