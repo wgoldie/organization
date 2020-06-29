@@ -38,3 +38,8 @@ class Query(object):
         results = list(self._enter())
         assert len(results) == 1
         return results[0]
+
+    def one_or_none(self):
+        results = list(self._enter())
+        assert len(results) <= 1
+        return results[0] if len(results) > 0 else None

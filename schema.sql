@@ -50,13 +50,15 @@ create table flashcard_decks (
 create table flashcards (
   id serial primary key,
   deck_id integer not null references flashcard_decks (id),
-  front text,
-  back text
+  front text not null,
+  back text not null,
 );
 
 create table flashcard_reviews (
   id serial primary key,
   flashcard_id integer not null references flashcards (id),
   review_time timestamp with time zone not null default now(),
-  correct boolean not null default false
+  review_count integer not null,
+  psuedo_review_count integer not null,
+  review_interval integer not null,
 );
