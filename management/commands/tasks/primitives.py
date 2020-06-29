@@ -2,10 +2,10 @@ from typing import List, Tuple
 
 from psycopg2 import sql
 
-from ..exceptions import UserError
-from ..query import Query
-from ..session import Session
-from .util import get_name_and_id
+from ...exceptions import UserError
+from ...query import Query
+from ...session import Session
+from ..util import get_name_and_id
 
 
 def get_board_id(session: Session, board_name: str) -> Tuple[int, str]:

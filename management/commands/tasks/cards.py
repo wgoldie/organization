@@ -1,9 +1,10 @@
 from typing import List
-from ..query import Query
-from ..session import Session
 
-from .util import assert_arguments
-from .primitives import get_board_id, get_column_id, \
+from ...query import Query
+from ...session import Session
+from ..util import assert_arguments
+from .primitives import \
+    get_board_id, get_column_id, \
     get_column_names, get_card_id
 
 

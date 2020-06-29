@@ -1,10 +1,9 @@
 from typing import Dict, Callable, List, Tuple
 
-from ..query import Query
-from ..exceptions import UserError
-from ..session import Session
-
-from .util import assert_arguments
+from ...query import Query
+from ...exceptions import UserError
+from ...session import Session
+from ..util import assert_arguments
 from .primitives import get_column_names, get_board_id
 
 

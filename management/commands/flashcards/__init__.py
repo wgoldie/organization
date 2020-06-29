@@ -2,10 +2,9 @@ from typing import List, Tuple
 
 from psycopg2 import sql
 
-from .util import assert_arguments
-from ..query import Query
-from ..session import Session
-from .util import get_name_and_id
+from ..util import assert_arguments, get_name_and_id
+from ...query import Query
+from ...session import Session
 
 
 def add_flashcard_deck(session: Session, arguments: List[str]):
@@ -15,14 +14,12 @@ def add_flashcard_deck(session: Session, arguments: List[str]):
     ).run()
 
 
-
 def list_flashcard_decks(session: Session, arguments: List[str]):
     assert_arguments(arguments, 0)
     with Query(session, 'select id, name from flashcard_decks;') as cursor:
         print('Decks:')
         for deck_id, name, in cursor:
             print(f"(@{deck_id}) {name}")
-
 
 
 def get_flashcard_deck_id(session: Session, deck_name: str) -> Tuple[int, str]:
