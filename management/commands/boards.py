@@ -25,4 +25,4 @@ def set_favorite_board(session: Session, arguments: List[str]) -> None:
     board_id, _ = get_board_id(session, board_name) 
     Query(session,
           'update boards set is_favorite = (id = %s);',
-          (get_board_id,)).run()
+          (board_id,)).run()

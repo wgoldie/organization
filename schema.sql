@@ -1,3 +1,5 @@
+-- task tracking / trello
+
 create table boards (
   id serial primary key,
   name text unique not null,
@@ -34,4 +36,27 @@ create table card_tags (
   card_id integer not null references cards (id),
   tag_id integer not null references tags (id),
   unique (card_id, tag_id)
+);
+
+
+-- SRS / flashcards
+
+create table flashcard_decks (
+  id serial primary key,
+  name text unique not null,
+  is_favorite boolean not null default false
+);
+
+create table flashcards (
+  id serial primary key,
+  deck_id integer not null references flashcard_decks (id),
+  front text,
+  back text
+);
+
+create table flashcard_reviews (
+  id serial primary key,
+  flashcard_id integer not null references flashcards (id),
+  review_time timestamp with time zone not null default now(),
+  correct boolean not null default false
 );
