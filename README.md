@@ -1,6 +1,6 @@
 basic organization tools repo for myself
 
-currently just has a trello/style task tracking system with columns/cards.
+currently just has a trello/style task tracking system with columns/cards and a basic SRS-based flashcard sysstem.
 
 ## requirements: 
 - postgres installation on the host machine or elsewhere,
