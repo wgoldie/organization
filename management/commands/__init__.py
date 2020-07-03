@@ -4,19 +4,20 @@ from .flashcards import FLASHCARD_COMMANDS
 from .tasks import TASK_COMMANDS 
 
 CommandFunc = Callable[[Session, List[str]], None]
+CommandMaps = Dict[str, Dict[str, CommandFunc]]
 
-def merge_command_maps(
-    *maps: List[Dict[str, CommandFunc]],
-) -> Dict[str, CommandFunc]:
-    merged = {}
-    for cmap in maps:
-        for k, v in cmap.items():
-            assert k not in merged
-            merged[k] = v
-    return merged
+command_maps: CommandMaps = {
+    'flashcards': FLASHCARD_COMMANDS,
+    'tasks': TASK_COMMANDS,
+}
 
+def build_help_command(maps: CommandMaps):
+    def help_command():
+        print("Commands:")
+        for module_name, cmap in maps.items():
+            print(f"\t{module_name}:")
+            for k in cmap:
+                print(f"\t\t{k}")
+    return help_command
 
-dispatch_map = merge_command_maps(
-    FLASHCARD_COMMANDS,
-    TASK_COMMANDS,
-)
+help_command = build_help_command(command_maps)

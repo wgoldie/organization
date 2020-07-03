@@ -7,7 +7,6 @@ from ...query import Query
 from ...session import Session
 
 
-
 def get_flashcard_deck_id(session: Session, deck_name: str) -> Tuple[int, str]:
     if deck_name == '--':
         return Query(

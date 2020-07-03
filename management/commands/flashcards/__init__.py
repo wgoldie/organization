@@ -7,7 +7,6 @@ FLASHCARD_COMMANDS = {
     'list_decks': list_flashcard_decks,
     'set_favorite_deck': set_favorite_deck,
     'add_flashcard': add_flashcard,
-    'review_flashcard': review_flashcard,
-    'print_flashcard_codes': print_response_codes,
+    'review': review_flashcard,
     'list_flashcards': list_flashcards,
 }
