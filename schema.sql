@@ -61,4 +61,5 @@ create table flashcard_reviews (
   review_count integer not null,
   psuedo_review_count integer not null,
   review_interval integer not null,
+  e_factor numeric not null,
 );

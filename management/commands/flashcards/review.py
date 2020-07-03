@@ -40,7 +40,7 @@ def update_card(session: Session, flashcard_id: int, score: int):
         review_count = 1
         pseudo_review_count = 1
         review_interval = 1
-        e_factor = 2.5 
+        e_factor = Dec(2.5) 
     else:
         review_count, pseudo_review_count, review_interval, e_factor = \
             review_definition
@@ -57,7 +57,7 @@ def update_card(session: Session, flashcard_id: int, score: int):
          pseudo_review_count, review_interval,
          e_factor)
         values
-        (%s, %s, %s, %s)
+        (%s, %s, %s, %s, %s)
         returning (id);''',
         (flashcard_id, review_count + 1,
          new_pseudo_review_count, new_review_interval,
@@ -69,16 +69,16 @@ def review_flashcard(session: Session, arguments: List[str]):
     deck_identifier, = assert_arguments(arguments, 1)
     deck_id, _ = get_flashcard_deck_id(session, deck_identifier)
     flashcard_id, front, back = Query(session, """
-        with (
-            select flashcard_id, max(review_time) from flashcard_reviews
-            group by flashcard_id
-        ) as cte_1,
-        (select flashcard_id,
-         review_time
+        with cte_2 as (
+         select flashcard_id,
+         review_time,
          review_time + (review_interval * INTERVAL '1 day') as next_review
          from flashcard_reviews
-         where flashcard_id, review_time in cte_1
-        ) as cte_2
+         where (flashcard_id, review_time) in (
+                select flashcard_id, max(review_time) from flashcard_reviews
+                group by flashcard_id
+            )
+        )
         select flashcards.id, front, back
         from flashcards
         left join cte_2
@@ -87,7 +87,27 @@ def review_flashcard(session: Session, arguments: List[str]):
         order by cte_2.next_review
         limit 1;
     """, (deck_id,)).one()
-    print(front)
+    print(f"Front: {front}")
+    input('...')
+    print(f"Back: {back}")
+    input_invalid = True
+    score = None
+    while input_invalid:
+        entry = input('score (0-5, ?) >').strip().lower()
+        if entry == 'q':
+            return
+        elif entry == '?':
+            print_response_codes(session, [])
+            continue
+        try:
+            score = int(entry)
+        except (ValueError, TypeError):
+            pass
+        if score is not None and score >= 0 and score <= 5:
+            update_card(session, flashcard_id, score)
+            return
+        print('Invalid input. Enter q to quit')
+
 
 
 def print_response_codes(session: Session, arguments: List[str]):
