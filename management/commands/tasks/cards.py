@@ -45,6 +45,17 @@ def list_cards(session: Session, arguments: List[str]):
             print(f'\t\t(_{card_id}) {card_name}')
 
 
+def edit_card(session: Session, arguments: List[str]):
+    board_name, card_name, edit = assert_arguments(arguments, 3)
+    board_id, _ = get_board_id(session, board_name)
+    card_id, _ = get_card_id(session, board_id, card_name)
+    Query(session,
+          '''update cards set name = %s
+          where cards.id = %s
+          and board_id = %s;''',
+          (edit, card_id, board_id)).run()
+
+
 def move_card(session: Session, arguments: List[str]):
     board_name, card_name, column_name = assert_arguments(arguments, 3)
     board_id, _ = get_board_id(session, board_name)

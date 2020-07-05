@@ -1,5 +1,5 @@
 from .boards import add_board, set_favorite_board, list_boards
-from .cards import add_card, list_cards, move_card, build_shift_card
+from .cards import add_card, list_cards, move_card, build_shift_card, edit_card
 from .columns import add_column
 
 
@@ -13,4 +13,5 @@ TASK_COMMANDS = {
     'move_card': move_card,
     'inc_card': build_shift_card(1),
     'dec_card': build_shift_card(-1),
+    'edit_card': edit_card,
 }
